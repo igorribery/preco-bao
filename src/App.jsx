@@ -1,14 +1,3 @@
-/*
-  PREÇO BÃO - landing page one page (React)
-
-  Logo e foto redonda do hero: src/assets/preco-bao.jpg (troque o arquivo se quiser).
-
-  Opcional em /public:
-    /public/capa-preco-bao.jpg   (capa larga, usada no compartilhamento)
-
-  Depois edite só o bloco CONFIG logo abaixo: links dos grupos e ofertas.
-*/
-
 import precoBaoHero from "./assets/preco-bao.jpg";
 
 // ====================== CONFIG (EDITE AQUI) ======================
@@ -16,13 +5,6 @@ const LINKS = {
   whatsapp: "https://chat.whatsapp.com/KksMxUlIoWPBCehzfJBRPe",
   telegram: "t.me/precobao1",
 };
-
-// Troque pelas ofertas reais. "img" é opcional (URL da foto do produto).
-// Sem "img", aparece o emoji.
-// const OFFERS = [
-//   { emoji: "🎧", loja: "Mercado Livre", titulo: "Fone Bluetooth com cancelamento de ruído", de: 249.9, por: 129.9, link: "https://seu-link-de-afiliado" },
-//   { emoji: "🍟", loja: "Amazon", titulo: "Air Fryer 4L digital", de: 399.0, por: 259.0, link: "https://seu-link-de-afiliado" },
-// ];
 
 const STEPS = [
   { icon: "⚖️", titulo: "Compara o preço", texto: "O robô vigia as lojas o dia todo e compara com o histórico do produto." },
@@ -34,12 +16,9 @@ const FAQ = [
   ["É de graça?", "Sim. Entrar e ficar nos grupos não custa nada."],
   ["Qual grupo eu escolho?", "Os dois recebem as mesmas ofertas. Use o app que você já abre todo dia."],
   ["Vou receber spam?", "Não. Só ofertas, sem conversa paralela. Você pode silenciar ou sair quando quiser."],
-  ["Como vocês ganham dinheiro?", "Alguns links são de afiliado: se você comprar, podemos receber uma comissão, sem pagar nada a mais por isso."],
 ];
 // ==================================================================
 
-// const brl = (n) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-// const off = (de, por) => Math.round((1 - por / de) * 100);
 
 const WaIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -100,34 +79,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* OFERTAS */}
-        {/* <section className="sec" id="ofertas">
-          <div className="wrap">
-            <h2>Ofertas que passaram pelo grupo</h2>
-            <p className="sub">Uma amostra do que cai todo dia. Quem está no grupo recebe na hora, com o preço ainda valendo.</p>
-
-            <div className="offers">
-              {OFFERS.map((o) => (
-                <article className="tag" key={o.titulo}>
-                  <span className="pill">-{off(o.de, o.por)}%</span>
-                  <div className="pic">
-                    {o.img ? <img src={o.img} alt={o.titulo} loading="lazy" /> : <span aria-hidden="true">{o.emoji}</span>}
-                  </div>
-                  <p className="store">{o.loja}</p>
-                  <h3>{o.titulo}</h3>
-                  <p className="price">
-                    <s>{brl(o.de)}</s>
-                    <strong>{brl(o.por)}</strong>
-                  </p>
-                  <a className="btn btn-orange" href={o.link} target="_blank" rel="noopener noreferrer sponsored">
-                    Ver oferta
-                  </a>
-                </article>
-              ))}
-            </div>
-            <p className="fine center">Preços e estoque mudam rápido e podem já ter acabado quando você clicar.</p>
-          </div>
-        </section> */}
 
         {/* COMO FUNCIONA */}
         <section className="sec alt">
