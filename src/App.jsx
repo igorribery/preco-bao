@@ -3,7 +3,7 @@ import precoBaoHero from "./assets/preco-bao.jpg";
 // ====================== CONFIG (EDITE AQUI) ======================
 const LINKS = {
   whatsapp: "https://chat.whatsapp.com/KksMxUlIoWPBCehzfJBRPe",
-  telegram: "t.me/precobao1",
+  telegram: "https://t.me/precobao1",
 };
 
 const STEPS = [
