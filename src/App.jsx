@@ -1,4 +1,6 @@
-import precoBaoHero from "./assets/preco-bao.jpg";
+import { useEffect, useRef, useState } from "react";
+import precoBaoHero from "./assets/preco-bao.webp";
+import precoBaoLogo from "./assets/preco-bao-logo.webp";
 
 // ====================== CONFIG (EDITE AQUI) ======================
 const LINKS = {
@@ -20,8 +22,10 @@ const FAQ = [
 // ==================================================================
 
 // Dispara evento no TikTok Pixel quando alguém clica para entrar no grupo
+// Em modo teste (?teste na URL) nada é enviado ao pixel
 const trackJoin = (canal, local) => {
   try {
+    if (window.__PB_TESTE) return;
     if (window.ttq) {
       window.ttq.track("Contact", { content_name: canal, content_category: local });
     }
@@ -41,6 +45,28 @@ const TgIcon = () => (
     <path d="M21.9 4.2 18.600 19.600c-.2 1.100-.9 1.400-1.800.9l-5-3.700-2.400 2.300c-.3.300-.5.500-1 .5l.4-5.100 9.300-8.400c.4-.4-.1-.6-.6-.2L6.200 13 1.300 11.500c-1.100-.3-1.100-1 .2-1.600L20.700 2.600c.9-.3 1.700.2 1.200 1.600z" />
   </svg>
 );
+
+// Mascote com esqueleto brilhando até a imagem carregar, depois aparece suavemente
+function HeroImg() {
+  const ref = useRef(null);
+  const [ok, setOk] = useState(false);
+  useEffect(() => {
+    if (ref.current?.complete && ref.current.naturalWidth > 0) setOk(true);
+  }, []);
+  return (
+    <img
+      ref={ref}
+      className={ok ? "loaded" : ""}
+      onLoad={() => setOk(true)}
+      src={precoBaoHero}
+      alt="Robô mascote do Preço Bão com uma lupa, carrinho de compras e ofertas"
+      width="460"
+      height="460"
+      fetchPriority="high"
+      decoding="async"
+    />
+  );
+}
 
 function CtaButtons({ local = "hero" }) {
   return (
@@ -72,9 +98,11 @@ export default function App() {
     <>
       <style>{css}</style>
 
+      {window.__PB_TESTE && <div className="teste-badge">MODO TESTE · pixel desligado</div>}
+
       <header className="top">
         <a className="brand" href="#topo" aria-label="Preço Bão">
-          <img src={precoBaoHero} alt="" width="44" height="44" />
+          <img src={precoBaoLogo} alt="" width="44" height="44" decoding="async" />
           <span>Preço <b>Bão</b></span>
         </a>
         <a className="btn btn-sm btn-wa" href={LINKS.whatsapp} target="_blank" rel="noopener noreferrer" onClick={() => trackJoin("whatsapp", "header")}>
@@ -98,7 +126,7 @@ export default function App() {
             </div>
             <div className="hero-art">
               <div className="hero-orb">
-                <img src={precoBaoHero} alt="Robô mascote do Preço Bão com uma lupa, carrinho de compras e ofertas" />
+                <HeroImg />
               </div>
             </div>
           </div>
@@ -180,8 +208,6 @@ export default function App() {
 }
 
 const css = `
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;600;700&display=swap');
-
 :root{
   --bg:#071a45; --bg2:#0b2559; --panel:#0f2f73; --line:#2a5db0;
   --orange:#ff8a1f; --yellow:#ffc72c; --ink:#ffffff; --muted:#b9cdf0;
@@ -209,6 +235,8 @@ h3{font-size:1.25rem}
 .hero-text{display:flex;flex-direction:column;align-items:center;text-align:center}
 .hero-text .cta-main{align-items:center;width:100%}
 .hero-text .fine{text-align:center}
+
+.teste-badge{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:99;background:#e11d48;color:#fff;font:700 11px/1 system-ui,sans-serif;padding:5px 10px;border-radius:0 0 8px 8px}
 
 /* botões */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:15px 24px;border-radius:999px;font-family:var(--display);font-weight:800;font-size:1.1rem;text-decoration:none;border:0;cursor:pointer;color:#fff;transition:transform .15s,filter .15s;box-shadow:0 4px 0 rgba(0,0,0,.28)}
@@ -240,7 +268,11 @@ h3{font-size:1.25rem}
 .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
 .hero-art{display:flex;justify-content:center}
 .hero-orb{flex-shrink:0;border-radius:50%;overflow:hidden;aspect-ratio:1}
-.hero-orb img{width:100%;height:100%;object-fit:cover;object-position:center;border-radius:0;box-shadow:none}
+.hero-orb{position:relative}
+.hero-orb::before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,#0f2f73 30%,#1f4fa3 50%,#0f2f73 70%) 0 0/200% 100%;animation:shimmer 1.3s linear infinite}
+.hero-orb img{position:relative;width:100%;height:100%;object-fit:cover;object-position:center;border-radius:0;box-shadow:none;opacity:0;transition:opacity .5s ease}
+.hero-orb img.loaded{opacity:1}
+@keyframes shimmer{to{background-position:-200% 0}}
 @keyframes float{50%{transform:translateY(-12px)}}
 @keyframes float-mobile{50%{transform:translateY(-5px)}}
 
@@ -324,5 +356,7 @@ footer{padding:30px 0 40px;color:var(--muted);font-size:.82rem;background:#05123
   .hero-orb{animation:none}
   .btn{transition:none}
   .btn-xl{animation:none}
+  .hero-orb::before{animation:none}
+  .hero-orb img{transition:none}
 }
 `;
