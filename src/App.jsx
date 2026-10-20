@@ -206,6 +206,9 @@ h3{font-size:1.25rem}
 .sub{color:var(--muted);max-width:60ch;margin-bottom:32px}
 .lead{color:#e3edff;font-size:1.15rem;max-width:46ch;margin:18px 0 28px}
 .fine{color:var(--muted);font-size:.88rem;margin-top:14px}
+.hero-text{display:flex;flex-direction:column;align-items:center;text-align:center}
+.hero-text .cta-main{align-items:center;width:100%}
+.hero-text .fine{text-align:center}
 
 /* botões */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:15px 24px;border-radius:999px;font-family:var(--display);font-weight:800;font-size:1.1rem;text-decoration:none;border:0;cursor:pointer;color:#fff;transition:transform .15s,filter .15s;box-shadow:0 4px 0 rgba(0,0,0,.28)}
