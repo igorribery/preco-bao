@@ -14,10 +14,21 @@ const STEPS = [
 
 const FAQ = [
   ["É de graça?", "Sim. Entrar e ficar nos grupos não custa nada."],
-  ["Qual grupo eu escolho?", "Os dois recebem as mesmas ofertas. Use o app que você já abre todo dia."],
+  ["Qual grupo eu escolho?", "Os dois recebem as mesmas ofertas. Recomendamos o WhatsApp, que você já abre todo dia. O Telegram é para quem prefere."],
   ["Vou receber spam?", "Não. Só ofertas, sem conversa paralela. Você pode silenciar ou sair quando quiser."],
 ];
 // ==================================================================
+
+// Dispara evento no TikTok Pixel quando alguém clica para entrar no grupo
+const trackJoin = (canal, local) => {
+  try {
+    if (window.ttq) {
+      window.ttq.track("Contact", { content_name: canal, content_category: local });
+    }
+  } catch {
+    /* nunca deixa o rastreio travar o clique */
+  }
+};
 
 
 const WaIcon = () => (
@@ -31,14 +42,26 @@ const TgIcon = () => (
   </svg>
 );
 
-function CtaButtons({ size = "lg" }) {
+function CtaButtons({ local = "hero" }) {
   return (
-    <div className={`cta cta-${size}`}>
-      <a className="btn btn-wa" href={LINKS.whatsapp} target="_blank" rel="noopener noreferrer">
-        <WaIcon /> Entrar no WhatsApp
+    <div className="cta-main">
+      <a
+        className="btn btn-wa btn-xl"
+        href={LINKS.whatsapp}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => trackJoin("whatsapp", local)}
+      >
+        <WaIcon /> Entrar no grupo do WhatsApp
       </a>
-      <a className="btn btn-tg" href={LINKS.telegram} target="_blank" rel="noopener noreferrer">
-        <TgIcon /> Entrar no Telegram
+      <a
+        className="link-tg"
+        href={LINKS.telegram}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => trackJoin("telegram", local)}
+      >
+        <TgIcon /> Prefere Telegram? Entre por aqui
       </a>
     </div>
   );
@@ -54,7 +77,7 @@ export default function App() {
           <img src={precoBaoHero} alt="" width="44" height="44" />
           <span>Preço <b>Bão</b></span>
         </a>
-        <a className="btn btn-sm btn-wa" href={LINKS.whatsapp} target="_blank" rel="noopener noreferrer">
+        <a className="btn btn-sm btn-wa" href={LINKS.whatsapp} target="_blank" rel="noopener noreferrer" onClick={() => trackJoin("whatsapp", "header")}>
           Entrar no grupo
         </a>
       </header>
@@ -70,7 +93,7 @@ export default function App() {
               <p className="lead">
                 O robô do Preço Bão vigia as lojas, compara os preços e só manda no grupo o que vale a pena. Entre de graça e pare de pagar caro.
               </p>
-              <CtaButtons />
+              <CtaButtons local="hero" />
               <p className="fine">Grupos gratuitos. Você sai quando quiser.</p>
             </div>
             <div className="hero-art">
@@ -104,14 +127,15 @@ export default function App() {
             <h2>Escolha onde quer receber</h2>
             <div className="groups">
               <div className="gcard gwa">
+                <span className="badge">⭐ Recomendado</span>
                 <h3>Grupo no WhatsApp</h3>
                 <p>As ofertas chegam junto com suas outras mensagens. Ideal para quem não quer instalar nada novo.</p>
-                <a className="btn btn-wa" href={LINKS.whatsapp} target="_blank" rel="noopener noreferrer"><WaIcon /> Entrar no WhatsApp</a>
+                <a className="btn btn-wa btn-xl" href={LINKS.whatsapp} target="_blank" rel="noopener noreferrer" onClick={() => trackJoin("whatsapp", "cards")}><WaIcon /> Entrar no WhatsApp</a>
               </div>
               <div className="gcard gtg">
                 <h3>Canal no Telegram</h3>
                 <p>Mesmas ofertas, com busca para achar posts antigos e sem limite de pessoas no grupo.</p>
-                <a className="btn btn-tg" href={LINKS.telegram} target="_blank" rel="noopener noreferrer"><TgIcon /> Entrar no Telegram</a>
+                <a className="btn btn-tg btn-sm" href={LINKS.telegram} target="_blank" rel="noopener noreferrer" onClick={() => trackJoin("telegram", "cards")}><TgIcon /> Entrar no Telegram</a>
               </div>
             </div>
           </div>
@@ -135,7 +159,7 @@ export default function App() {
           <div className="wrap">
             <h2>A próxima oferta boa já está saindo</h2>
             <p className="sub">Entre agora e não fique sabendo só depois que acabou.</p>
-            <CtaButtons />
+            <CtaButtons local="final" />
           </div>
         </section>
       </main>
@@ -148,8 +172,8 @@ export default function App() {
 
       {/* Barra fixa no celular: o clique de quem veio do anúncio fica sempre a um toque */}
       <nav className="dock" aria-label="Entrar nos grupos">
-        <a className="btn btn-wa" href={LINKS.whatsapp} target="_blank" rel="noopener noreferrer"><WaIcon /> WhatsApp</a>
-        <a className="btn btn-tg" href={LINKS.telegram} target="_blank" rel="noopener noreferrer"><TgIcon /> Telegram</a>
+        <a className="btn btn-wa" href={LINKS.whatsapp} target="_blank" rel="noopener noreferrer" onClick={() => trackJoin("whatsapp", "dock")}><WaIcon /> Entrar no WhatsApp</a>
+        <a className="btn btn-tg" href={LINKS.telegram} target="_blank" rel="noopener noreferrer" onClick={() => trackJoin("telegram", "dock")}><TgIcon /> Telegram</a>
       </nav>
     </>
   );
@@ -191,6 +215,13 @@ h3{font-size:1.25rem}
 .btn-orange{background:var(--orange);color:#2b1300;width:100%}
 .btn-sm{padding:9px 18px;font-size:1rem}
 .cta{display:flex;flex-wrap:wrap;gap:14px}
+.cta-main{display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+.btn-xl{padding:18px 34px;font-size:1.3rem;animation:pulse 2.2s ease-out infinite}
+@keyframes pulse{0%{box-shadow:0 4px 0 rgba(0,0,0,.28),0 0 0 0 rgba(31,168,85,.65)}70%{box-shadow:0 4px 0 rgba(0,0,0,.28),0 0 0 16px rgba(31,168,85,0)}100%{box-shadow:0 4px 0 rgba(0,0,0,.28),0 0 0 0 rgba(31,168,85,0)}}
+.link-tg{display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:.95rem;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.link-tg:hover{color:#fff}
+.link-tg svg{width:18px;height:18px}
+.badge{background:var(--yellow);color:#2b1300;font-family:var(--display);font-weight:800;font-size:.85rem;padding:3px 12px;border-radius:999px}
 
 /* header */
 .top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:10px max(20px,calc((100% - 1080px)/2));background:rgba(7,26,69,.92);backdrop-filter:blur(8px);border-bottom:1px solid rgba(42,93,176,.5)}
@@ -240,11 +271,13 @@ h3{font-size:1.25rem}
 .steps p{color:var(--muted)}
 
 /* grupos */
-.groups{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:28px}
+.groups{display:grid;grid-template-columns:1.3fr .9fr;align-items:stretch;gap:22px;margin-top:28px}
 .gcard{border-radius:24px;padding:30px;display:flex;flex-direction:column;align-items:flex-start;gap:14px;border:2px solid}
 .gwa{background:linear-gradient(160deg,rgba(31,168,85,.22),var(--panel));border-color:var(--wa)}
 .gtg{background:linear-gradient(160deg,rgba(43,143,224,.28),var(--panel));border-color:var(--tg)}
 .gcard p{color:#dbe7ff;flex:1}
+.gwa{box-shadow:0 0 0 3px rgba(31,168,85,.35),0 10px 40px rgba(31,168,85,.25)}
+.gtg{opacity:.85}
 
 /* faq */
 details{border-bottom:1px solid var(--line);padding:16px 0}
@@ -257,7 +290,7 @@ details p{color:var(--muted);margin-top:10px}
 /* cta final */
 .final{padding:80px 0;text-align:center;background:linear-gradient(180deg,var(--bg),#0a2a6e)}
 .final .sub{margin-inline:auto}
-.final .cta{justify-content:center}
+.final .cta-main{align-items:center}
 
 footer{padding:30px 0 40px;color:var(--muted);font-size:.82rem;background:#05123099}
 
@@ -269,7 +302,8 @@ footer{padding:30px 0 40px;color:var(--muted);font-size:.82rem;background:#05123
   .hero-grid{grid-template-columns:1fr;text-align:center;gap:28px}
   .hero-text h1{font-size:clamp(1.85rem,8vw,2.35rem)}
   .lead{margin-inline:auto;font-size:1.05rem;margin:14px 0 22px}
-  .hero .cta{justify-content:center}
+  .hero .cta-main{align-items:center}
+  .btn-xl{padding:17px 20px;font-size:1.15rem}
   .hero-art{margin-top:4px}
   .hero-orb{width:min(280px,66vw);max-width:none;box-shadow:0 0 0 4px rgba(255,199,44,.9),0 0 36px rgba(43,143,224,.45);animation:float-mobile 5s ease-in-out infinite}
   .steps,.groups{grid-template-columns:1fr}
@@ -278,11 +312,14 @@ footer{padding:30px 0 40px;color:var(--muted);font-size:.82rem;background:#05123
   .btn-sm{width:auto}
   .dock{display:flex;gap:10px;position:fixed;inset:auto 0 0 0;z-index:30;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:rgba(7,26,69,.96);border-top:1px solid var(--line)}
   .dock .btn{padding:12px 10px;font-size:1rem}
+  .dock .btn-wa{flex:2}
+  .dock .btn-tg{flex:1;background:transparent;border:2px solid var(--tg);box-shadow:none;color:#cfe4ff}
   footer{padding-bottom:100px}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .hero-orb{animation:none}
   .btn{transition:none}
+  .btn-xl{animation:none}
 }
 `;
