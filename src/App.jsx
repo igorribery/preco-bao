@@ -98,6 +98,7 @@ function Preview() {
                   <img
                     className="pv-img"
                     src={o.imagem}
+                    alt={`Oferta encontrada na ${o.loja}`}
                     width="440"
                     height="330"
                     loading={k === 0 ? "eager" : "lazy"}
@@ -215,7 +216,7 @@ export default function App() {
 
       <header className="top">
         <a className="brand" href="#topo" aria-label="Preço Bão">
-          <img src={precoBaoLogo} alt="" width="44" height="44" decoding="async" />
+          <img src={precoBaoLogo} alt="Logotipo Preço Bão" width="44" height="44" decoding="async" />
           <span>Preço <b>Bão</b></span>
         </a>
         <a className="btn btn-sm btn-wa" href={LINKS.whatsapp} target="_blank" rel="noopener noreferrer" onClick={() => trackJoin("whatsapp", "header")}>
