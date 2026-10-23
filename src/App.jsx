@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import precoBaoHero from "./assets/preco-bao.webp";
+import { useEffect, useState } from "react";
 import precoBaoLogo from "./assets/preco-bao-logo.webp";
+import tenisFoto from "./assets/tenisFoto.jpeg";
+import secadorfoto from "./assets/secadorfoto.jpeg";
+import amazonfoto from "./assets/amazonFoto.jpeg";
 
 // ====================== CONFIG (EDITE AQUI) ======================
 const LINKS = {
@@ -19,15 +21,30 @@ const FAQ = [
   ["Qual grupo eu escolho?", "Os dois recebem as mesmas ofertas. Recomendamos o WhatsApp, que você já abre todo dia. O Telegram é para quem prefere."],
   ["Vou receber spam?", "Não. Só ofertas, sem conversa paralela. Você pode silenciar ou sair quando quiser."],
 ];
-// ==================================================================
 
-// Dispara evento no TikTok Pixel quando alguém clica para entrar no grupo
-// Em modo teste (?teste na URL) nada é enviado ao pixel
+const NOMES = { whatsapp: "WhatsApp", telegram: "Telegram" };
+
+// Ofertas que passam no cartão do topo (3 a 5 é o ideal). Troque quando quiser.
+// As fotos ficam em public/ofertas/ (WebP, ~880x660, até 60 KB cada).
+const OFERTAS_TOPO = [
+  { loja: "Shopee", imagem: secadorfoto },
+  { loja: "Mercado Livre", imagem: tenisFoto },
+  { loja: "Amazon", imagem: amazonfoto },
+];
+
+// Dispara eventos nos pixels (TikTok e Meta) quando alguém clica para entrar no grupo
+// e avisa o overlay "Abrindo o app..." (evento pb-join).
+// Em modo teste (?teste na URL) nada é enviado aos pixels.
 const trackJoin = (canal, local) => {
   try {
+    // avisa o overlay (funciona até no modo teste)
+    window.dispatchEvent(new CustomEvent("pb-join", { detail: canal }));
     if (window.__PB_TESTE) return;
     if (window.ttq) {
       window.ttq.track("Contact", { content_name: canal, content_category: local });
+    }
+    if (window.fbq) {
+      window.fbq("track", "Lead", { content_name: canal, content_category: local });
     }
   } catch {
     /* nunca deixa o rastreio travar o clique */
@@ -46,25 +63,62 @@ const TgIcon = () => (
   </svg>
 );
 
-// Mascote com esqueleto brilhando até a imagem carregar, depois aparece suavemente
-function HeroImg() {
-  const ref = useRef(null);
-  const [ok, setOk] = useState(false);
+// Cartão do topo: carrossel de ofertas reais (como chegam no grupo) + números reais
+function Preview() {
+  const [i, setI] = useState(0);
+  const [pausado, setPausado] = useState(false);
+  const total = OFERTAS_TOPO.length;
+  const reduz = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+  const INTERVALO = 2000;
+  // avança sozinho; clicar nas bolinhas reinicia a contagem
   useEffect(() => {
-    if (ref.current?.complete && ref.current.naturalWidth > 0) setOk(true);
-  }, []);
+    if (total < 2 || pausado || reduz) return;
+    const t = setTimeout(() => setI((n) => (n + 1) % total), INTERVALO);
+    return () => clearTimeout(t);
+  }, [i, pausado, reduz, total]);
+
   return (
-    <img
-      ref={ref}
-      className={ok ? "loaded" : ""}
-      onLoad={() => setOk(true)}
-      src={precoBaoHero}
-      alt="Robô mascote do Preço Bão com uma lupa, carrinho de compras e ofertas"
-      width="460"
-      height="460"
-      fetchPriority="high"
-      decoding="async"
-    />
+    <aside
+      className="preview"
+      aria-label="Exemplos de ofertas do grupo"
+      onMouseEnter={() => setPausado(true)}
+      onMouseLeave={() => setPausado(false)}
+      onFocus={() => setPausado(true)}
+      onBlur={() => setPausado(false)}
+    >
+      <p className="pv-title">Assim as ofertas chegam no grupo</p>
+      <div className="pv-slides" role="group" aria-roledescription="carrossel">
+        {OFERTAS_TOPO.map((o, k) => {
+          return (
+            <div key={o.titulo} className={"pv-slide" + (k === i ? " on" : "")} aria-hidden={k !== i}>
+               <p className="pv-title">{o.loja}</p>
+              <div className="pv-msg">
+                {o.imagem && (
+                  <img
+                    className="pv-img"
+                    src={o.imagem}
+                    width="440"
+                    height="330"
+                    loading={k === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                    onError={(e) => { e.currentTarget.style.display = "none"; }}
+                  />
+                )}
+                <strong>{o.titulo}</strong>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {total > 1 && (
+        <div className="pv-dots">
+          {OFERTAS_TOPO.map((o, k) => (
+            <button key={o.titulo} type="button" className={k === i ? "on" : ""} aria-label={`Ver oferta ${k + 1} de ${total}`} onClick={() => setI(k)} />
+          ))}
+        </div>
+      )}
+    </aside>
   );
 }
 
@@ -93,10 +147,69 @@ function CtaButtons({ local = "hero" }) {
   );
 }
 
+// Overlay "Abrindo o WhatsApp..." que vira "Não abriu? Tentar novamente" após 4s
+function JoinOverlay() {
+  const [canal, setCanal] = useState(null);
+  const [demorou, setDemorou] = useState(false);
+  const [copiado, setCopiado] = useState(false);
+
+  useEffect(() => {
+    const abrir = (e) => { setCanal(e.detail); setDemorou(false); setCopiado(false); };
+    const ocultou = () => { if (document.hidden) setCanal(null); }; // app abriu: fecha o overlay
+    window.addEventListener("pb-join", abrir);
+    document.addEventListener("visibilitychange", ocultou);
+    return () => {
+      window.removeEventListener("pb-join", abrir);
+      document.removeEventListener("visibilitychange", ocultou);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!canal) return;
+    const t = setTimeout(() => setDemorou(true), 4000);
+    return () => clearTimeout(t);
+  }, [canal]);
+
+  if (!canal) return null;
+  const nome = NOMES[canal];
+  const link = LINKS[canal];
+
+  const copiar = async () => {
+    try { await navigator.clipboard.writeText(link); setCopiado(true); } catch { /* ignora */ }
+  };
+
+  return (
+    <div className="join-ov" role="dialog" aria-modal="true" aria-live="polite">
+      <div className="join-box">
+        {!demorou ? (
+          <>
+            <div className="join-spin" aria-hidden="true" />
+            <h3>Abrindo o {nome}…</h3>
+            <p>Aguarde um instante, estamos te levando para o grupo.</p>
+          </>
+        ) : (
+          <>
+            <h3>O {nome} não abriu?</h3>
+            <p>Sem problemas! Toque no botão abaixo para tentar de novo.</p>
+            <a className={"btn btn-" + (canal === "whatsapp" ? "wa" : "tg")} href={link} target="_blank" rel="noopener noreferrer">
+              Tentar novamente
+            </a>
+            <button type="button" className="join-copy" onClick={copiar}>
+              {copiado ? "Link copiado ✅" : "Copiar link do grupo"}
+            </button>
+          </>
+        )}
+        <button type="button" className="join-close" onClick={() => setCanal(null)}>Fechar</button>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <>
       <style>{css}</style>
+      <JoinOverlay />
 
       {window.__PB_TESTE && <div className="teste-badge">MODO TESTE · pixel desligado</div>}
 
@@ -115,20 +228,14 @@ export default function App() {
         <section className="hero">
           <div className="wrap hero-grid">
             <div className="hero-text">
-              <h1>
-                Oferta boa de verdade, direto no seu celular antes de acabar
-              </h1>
+              <h1>Grupo VIP de promoções entre no grupo e aproveite!</h1>
               <p className="lead">
-                O robô do Preço Bão vigia as lojas, compara os preços e só manda no grupo o que vale a pena. Entre de graça e pare de pagar caro.
+                O robô do Preço Bão vigia as lojas, compara os preços e só manda no grupo o que <strong>vale a pena</strong> e nas maiores lojas como Shopee, Mercado Livre e Amazon. Entre de graça e pare de pagar caro.
               </p>
               <CtaButtons local="hero" />
               <p className="fine">Grupos gratuitos. Você sai quando quiser.</p>
             </div>
-            <div className="hero-art">
-              <div className="hero-orb">
-                <HeroImg />
-              </div>
-            </div>
+            <Preview />
           </div>
         </section>
 
@@ -194,7 +301,7 @@ export default function App() {
 
       <footer>
         <div className="wrap">
-          <p>2026 © Preço Bão - Todos os direitos reservados..</p>
+          <p>© 2026 Preço Bão. Todos os direitos reservados.</p>
         </div>
       </footer>
 
@@ -266,20 +373,37 @@ h3{font-size:1.25rem}
   linear-gradient(rgba(42,93,176,.22) 1px,transparent 1px) 0 0/48px 48px,
   linear-gradient(90deg,rgba(42,93,176,.22) 1px,transparent 1px) 0 0/48px 48px,var(--bg)}
 .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
-.hero-art{display:flex;justify-content:center}
-.hero-orb{flex-shrink:0;border-radius:50%;overflow:hidden;aspect-ratio:1}
-.hero-orb{position:relative}
-.hero-orb::before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,#0f2f73 30%,#1f4fa3 50%,#0f2f73 70%) 0 0/200% 100%;animation:shimmer 1.3s linear infinite}
-.hero-orb img{position:relative;width:100%;height:100%;object-fit:cover;object-position:center;border-radius:0;box-shadow:none;opacity:0;transition:opacity .5s ease}
-.hero-orb img.loaded{opacity:1}
-@keyframes shimmer{to{background-position:-200% 0}}
-@keyframes float{50%{transform:translateY(-12px)}}
-@keyframes float-mobile{50%{transform:translateY(-5px)}}
-
-@media (min-width:821px){
-  .hero-orb{width:100%;max-width:460px;aspect-ratio:1;box-shadow:0 0 0 6px rgba(255,199,44,.9),0 0 60px rgba(43,143,224,.6);animation:float 5s ease-in-out infinite}
-  .hero-orb img{object-fit:cover}
+.preview{width:100%;max-width:440px;margin-inline:auto;background:var(--panel);border:2px solid var(--line);border-radius:24px;padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 0 0 4px rgba(255,199,44,.25),0 20px 50px rgba(0,0,0,.35)}
+.pv-title{font-family:var(--display);font-weight:800;font-size:1.15rem;color:var(--yellow)}
+.pv-slides{display:grid}
+.pv-slide{grid-area:1/1;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility .45s}
+.pv-slide.on{opacity:1;visibility:visible}
+.pv-msg{height:100%;background:var(--bg);border-radius:6px 18px 18px 18px;padding:12px 12px 16px;display:flex;flex-direction:column;gap:6px;border-left:4px solid var(--wa)}
+.pv-img {
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  object-fit: contain;
+  background: var(--bg);
+  border-radius: 3px 9px 9px 9px;
+  margin-bottom: 3px;
 }
+.pv-top{display:flex;justify-content:space-between;align-items:center}
+.pill-sm{background:var(--orange);color:#2b1300;font-family:var(--display);font-weight:800;padding:1px 10px;border-radius:999px;font-size:.95rem}
+.pv-msg strong{font-weight:700;line-height:1.35}
+.pv-price{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.pv-price s{color:var(--muted)}
+.pv-price b{font-family:var(--display);font-size:1.8rem}
+.pv-price em{font-style:normal;color:var(--muted);font-size:.9rem}
+.pv-meta{color:var(--muted);font-size:.85rem}
+.pv-dots{display:flex;justify-content:center;gap:2px}
+.pv-dots button{width:24px;height:24px;padding:0;border:0;background:none;cursor:pointer;display:grid;place-items:center}
+.pv-dots button::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--line);transition:background .2s,transform .2s}
+.pv-dots button.on::before{background:var(--yellow);transform:scale(1.25)}
+.pv-stats{list-style:none;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pv-stats li{display:flex;flex-direction:column}
+.pv-stats strong{font-family:var(--display);font-size:2rem;color:var(--yellow);line-height:1}
+.pv-stats span{color:var(--muted);font-size:.85rem;line-height:1.3;margin-top:4px}
+.pv-note{color:var(--muted);font-size:.78rem}
 
 /* seções */
 .sec{padding:72px 0}
@@ -312,7 +436,6 @@ h3{font-size:1.25rem}
 .gtg{background:linear-gradient(160deg,rgba(43,143,224,.28),var(--panel));border-color:var(--tg)}
 .gcard p{color:#dbe7ff;flex:1}
 .gwa{box-shadow:0 0 0 3px rgba(31,168,85,.35),0 10px 40px rgba(31,168,85,.25)}
-.gtg{opacity:.85}
 
 /* faq */
 details{border-bottom:1px solid var(--line);padding:16px 0}
@@ -332,6 +455,15 @@ footer{padding:30px 0 40px;color:var(--muted);font-size:.82rem;background:#05123
 /* barra fixa mobile */
 .dock{display:none}
 
+/* overlay ao clicar em entrar no grupo */
+.join-ov{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;background:rgba(3,10,30,.88);backdrop-filter:blur(4px)}
+.join-box{width:min(420px,100%);background:var(--panel);border:2px solid var(--line);border-radius:24px;padding:30px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
+.join-box p{color:var(--muted)}
+.join-spin{width:54px;height:54px;border-radius:50%;border:5px solid rgba(255,255,255,.15);border-top-color:var(--yellow);animation:spin 0.9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.join-copy,.join-close{background:none;border:0;color:var(--muted);font:inherit;font-size:.95rem;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.join-copy:hover,.join-close:hover{color:#fff}
+
 @media (max-width:820px){
   .hero{padding:24px 0 40px}
   .hero-grid{grid-template-columns:1fr;text-align:center;gap:28px}
@@ -339,8 +471,6 @@ footer{padding:30px 0 40px;color:var(--muted);font-size:.82rem;background:#05123
   .lead{margin-inline:auto;font-size:1.05rem;margin:14px 0 22px}
   .hero .cta-main{align-items:center}
   .btn-xl{padding:17px 20px;font-size:1.15rem}
-  .hero-art{margin-top:4px}
-  .hero-orb{width:min(280px,66vw);max-width:none;box-shadow:0 0 0 4px rgba(255,199,44,.9),0 0 36px rgba(43,143,224,.45);animation:float-mobile 5s ease-in-out infinite}
   .steps,.groups{grid-template-columns:1fr}
   .sec{padding:52px 0}
   .btn{width:100%}
@@ -353,10 +483,9 @@ footer{padding:30px 0 40px;color:var(--muted);font-size:.82rem;background:#05123
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
-  .hero-orb{animation:none}
   .btn{transition:none}
+  .pv-slide{transition:none}
   .btn-xl{animation:none}
-  .hero-orb::before{animation:none}
-  .hero-orb img{transition:none}
+  .join-spin{animation:none}
 }
 `;
