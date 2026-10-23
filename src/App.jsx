@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import precoBaoLogo from "./assets/preco-bao-logo.avif";
 import tenisFoto from "./assets/tenisFoto.avif";
-import secadorfoto from "./assets/secadorfoto.avif";
+import shopee from "./assets/shopee.avif";
 import amazonfoto from "./assets/amazonFoto.avif";
 
 // ====================== CONFIG (EDITE AQUI) ======================
@@ -27,7 +27,7 @@ const NOMES = { whatsapp: "WhatsApp", telegram: "Telegram" };
 // Ofertas que passam no cartão do topo (3 a 5 é o ideal). Troque quando quiser.
 // As fotos ficam em public/ofertas/ (WebP, ~880x660, até 60 KB cada).
 const OFERTAS_TOPO = [
-  { loja: "Shopee", imagem: secadorfoto },
+  { loja: "Shopee", imagem: shopee },
   { loja: "Mercado Livre", imagem: tenisFoto },
   { loja: "Amazon", imagem: amazonfoto },
 ];
@@ -317,9 +317,9 @@ export default function App() {
 
 const css = `
 :root{
-  --bg:#071a45; --bg2:#0b2559; --panel:#0f2f73; --line:#2a5db0;
-  --orange:#ff8a1f; --yellow:#ffc72c; --ink:#ffffff; --muted:#b9cdf0;
-  --wa:#1fa855; --tg:#2b8fe0;
+  --bg:#071a45; --bg2:#091e4a; --panel:#0d2861; --line:#2a5db0;
+  --orange:#ff8a1f; --yellow:#ffd24c; --ink:#ffffff; --muted:#d2e1fc;
+  --wa:#14823f; --tg:#1d7bc9;
   --display:'Baloo 2','Trebuchet MS',system-ui,sans-serif;
   --body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
 }
