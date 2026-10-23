@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import precoBaoLogo from "./assets/preco-bao-logo.webp";
-import tenisFoto from "./assets/tenisFoto.jpeg";
-import secadorfoto from "./assets/secadorfoto.jpeg";
-import amazonfoto from "./assets/amazonFoto.jpeg";
+import precoBaoLogo from "./assets/preco-bao-logo.avif";
+import tenisFoto from "./assets/tenisFoto.avif";
+import secadorfoto from "./assets/secadorfoto.avif";
+import amazonfoto from "./assets/amazonFoto.avif";
 
 // ====================== CONFIG (EDITE AQUI) ======================
 const LINKS = {
@@ -70,7 +70,7 @@ function Preview() {
   const total = OFERTAS_TOPO.length;
   const reduz = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
-  const INTERVALO = 2000;
+  const INTERVALO = 2000; // milissegundos entre uma oferta e a próxima
   // avança sozinho; clicar nas bolinhas reinicia a contagem
   useEffect(() => {
     if (total < 2 || pausado || reduz) return;
