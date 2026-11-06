@@ -44,7 +44,12 @@ const trackJoin = (canal, local) => {
       window.ttq.track("Contact", { content_name: canal, content_category: local });
     }
     if (window.fbq) {
-      window.fbq("track", "Lead", { content_name: canal, content_category: local });
+      const params = { content_name: canal, content_category: local };
+      if (canal === "whatsapp") {
+        window.fbq("track", "Lead", params);
+      } else if (canal === "telegram") {
+        window.fbq("trackCustom", "TelegramClick", params);
+      }
     }
   } catch {
     /* nunca deixa o rastreio travar o clique */
