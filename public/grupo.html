@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#071a45">
+<title>Abrindo o grupo Preço Bão…</title>
+<link rel="preconnect" href="https://connect.facebook.net">
+<style>
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{display:flex;align-items:center;justify-content:center;padding:24px;background:#071a45;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;text-align:center}
+  main{width:100%;max-width:360px}
+  h1{margin:0 0 6px;font-size:26px}
+  p{margin:0;color:#c9d6f2;font-size:16px;line-height:1.4}
+  .giro{width:44px;height:44px;margin:0 auto 20px;border-radius:50%;border:4px solid rgba(255,255,255,.25);border-top-color:#25d366;animation:g .8s linear infinite}
+  @keyframes g{to{transform:rotate(360deg)}}
+  a.botao{display:block;margin:24px 0 16px;padding:16px;border-radius:999px;background:#25d366;color:#06281a;font-size:18px;font-weight:700;text-decoration:none}
+  small{display:block;color:#8fa3cc;font-size:12px;line-height:1.4}
+  @media (prefers-reduced-motion:reduce){.giro{animation:none}}
+</style>
+<script>
+(function () {
+  var PIXEL = '1422836456663546';
+  // Passa pelo rastreador do grp.lpboa.com: ele conta a chegada no painel e leva ao convite do WhatsApp.
+  var DESTINO = 'https://grp.lpboa.com/preco-bao/entrar';
+
+  var url = DESTINO + location.search;
+  window.__pbDestino = url;
+
+  // Robôs de pré-visualização não contam e não são redirecionados.
+  if (/bot|crawl|spider|facebookexternalhit|facebot|whatsapp|telegram|preview/i.test(navigator.userAgent)) return;
+
+  var saiu = false;
+  function ir() {
+    if (saiu) return;
+    saiu = true;
+    location.replace(url);
+  }
+
+  !function (f, b, e, v, n, t, s) {
+    if (f.fbq) return;
+    n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); };
+    if (!f._fbq) f._fbq = n;
+    n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = [];
+    t = b.createElement(e); t.async = !0; t.src = v;
+    // Espera o Pixel carregar e enviar o Lead antes de sair; se estiver bloqueado, segue na hora.
+    t.onload = function () { setTimeout(ir, 350); };
+    t.onerror = ir;
+    s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s);
+  }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+
+  fbq('init', PIXEL);
+  fbq('track', 'PageView');
+
+  // Um Lead por sessão, para recarregar a página não contar duas vezes.
+  var jaContou = false;
+  try { jaContou = !!sessionStorage.getItem('pb_lead'); } catch (e) {}
+  if (!jaContou) {
+    fbq('track', 'Lead', { content_name: 'grupo_whatsapp' }, { eventID: 'pb-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8) });
+    try { sessionStorage.setItem('pb_lead', '1'); } catch (e) {}
+  }
+
+  // Limite de segurança: a pessoa nunca fica presa aqui.
+  setTimeout(ir, 2000);
+})();
+</script>
+</head>
+<body>
+<main>
+  <div class="giro" aria-hidden="true"></div>
+  <h1>Preço Bão</h1>
+  <p role="status">Abrindo o grupo de ofertas no seu WhatsApp…</p>
+  <a class="botao" id="abrir" href="https://grp.lpboa.com/preco-bao/entrar">Entrar no grupo</a>
+  <small>Grupo gratuito. Você sai quando quiser. Este site não é afiliado à Meta nem ao WhatsApp.</small>
+</main>
+<script>
+  if (window.__pbDestino) document.getElementById('abrir').href = window.__pbDestino;
+</script>
+</body>
+</html>
