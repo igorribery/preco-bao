@@ -29,9 +29,6 @@
   var url = DESTINO + location.search;
   window.__pbDestino = url;
 
-  // Robôs de pré-visualização não contam e não são redirecionados.
-  if (/bot|crawl|spider|facebookexternalhit|facebot|whatsapp|telegram|preview/i.test(navigator.userAgent)) return;
-
   var saiu = false;
   function ir() {
     if (saiu) return;
