@@ -4,37 +4,42 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#071a45">
-<title>Abrindo o grupo Preço Bão…</title>
+<meta name="theme-color" content="#06163a">
+<title>Preço Bão: grupo grátis de ofertas no WhatsApp</title>
 <link rel="preconnect" href="https://connect.facebook.net">
 <style>
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0}
-  body{display:flex;align-items:center;justify-content:center;padding:24px;background:#071a45;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;text-align:center}
-  main{width:100%;max-width:360px}
-  h1{margin:0 0 6px;font-size:26px}
-  p{margin:0;color:#c9d6f2;font-size:16px;line-height:1.4}
-  .giro{width:44px;height:44px;margin:0 auto 20px;border-radius:50%;border:4px solid rgba(255,255,255,.25);border-top-color:#25d366;animation:g .8s linear infinite}
-  @keyframes g{to{transform:rotate(360deg)}}
-  a.botao{display:block;margin:24px 0 16px;padding:16px;border-radius:999px;background:#25d366;color:#06281a;font-size:18px;font-weight:700;text-decoration:none}
-  small{display:block;color:#8fa3cc;font-size:12px;line-height:1.4}
-  @media (prefers-reduced-motion:reduce){.giro{animation:none}}
+  html,body{margin:0}
+  body{min-height:100vh;display:flex;justify-content:center;padding:20px 16px 28px;background:radial-gradient(circle at 50% 20%,#0e3a8c 0%,#0a2460 45%,#06163a 100%) fixed;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;text-align:center}
+  main{width:100%;max-width:400px}
+  .logo{width:112px;height:112px;border-radius:50%;box-shadow:0 0 0 3px #39b8ff,0 10px 30px rgba(0,0,0,.5)}
+  h1{margin:14px 0 4px;font-size:27px;line-height:1.15;font-weight:900}
+  h1 b{color:#ffc531}
+  p.sub{margin:0;color:#cfdcf7;font-size:16px;line-height:1.4}
+  a.botao{display:flex;align-items:center;justify-content:center;gap:10px;margin:18px 0 8px;padding:17px 12px;border-radius:999px;background:#25d366;color:#fff;font-size:19px;font-weight:800;text-decoration:none;box-shadow:0 10px 28px rgba(37,211,102,.4);animation:p 1.6s ease-in-out infinite}
+  a.botao svg{width:26px;height:26px;flex-shrink:0}
+  @keyframes p{50%{transform:scale(1.035)}}
+  .nota{margin:0 0 20px;color:#9fb4de;font-size:13px}
+  h2{margin:0 0 10px;font-size:15px;font-weight:800;letter-spacing:.04em;color:#ffb347}
+  .grade{display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:center}
+  .card{background:#fff;border-radius:14px;overflow:hidden;color:#1b2540;position:relative}
+  .card img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover}
+  .card i{position:absolute;top:8px;right:8px;background:#ffc531;color:#06163a;font-style:normal;font-weight:900;font-size:13px;padding:3px 8px;border-radius:8px}
+  .card div{padding:8px 6px 10px}
+  .card span{display:block;font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .card s{color:#8b94a7;font-size:12px}
+  .card strong{color:#e86a00;font-size:18px;font-weight:900}
+  ul{list-style:none;margin:18px 0 0;padding:0;display:grid;gap:8px;text-align:left;font-size:15px;color:#e6eeff}
+  li::before{content:"✓";display:inline-block;width:22px;height:22px;line-height:22px;margin-right:9px;border-radius:50%;background:#25d366;color:#fff;font-weight:900;text-align:center;font-size:13px}
+  small{display:block;margin-top:20px;color:#8fa3cc;font-size:11.5px;line-height:1.45}
+  @media (prefers-reduced-motion:reduce){a.botao{animation:none}}
 </style>
 <script>
 (function () {
   var PIXEL = '1422836456663546';
   // Passa pelo rastreador do grp.lpboa.com: ele conta a chegada no painel e leva ao convite do WhatsApp.
   var DESTINO = 'https://grp.lpboa.com/preco-bao/entrar';
-
   var url = DESTINO + location.search;
-  window.__pbDestino = url;
-
-  var saiu = false;
-  function ir() {
-    if (saiu) return;
-    saiu = true;
-    location.replace(url);
-  }
 
   !function (f, b, e, v, n, t, s) {
     if (f.fbq) return;
@@ -42,38 +47,68 @@
     if (!f._fbq) f._fbq = n;
     n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = [];
     t = b.createElement(e); t.async = !0; t.src = v;
-    // Espera o Pixel carregar e enviar o Lead antes de sair; se estiver bloqueado, segue na hora.
-    t.onload = function () { setTimeout(ir, 350); };
-    t.onerror = ir;
     s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s);
   }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
 
   fbq('init', PIXEL);
   fbq('track', 'PageView');
 
-  // Um Lead por sessão, para recarregar a página não contar duas vezes.
-  var jaContou = false;
-  try { jaContou = !!sessionStorage.getItem('pb_lead'); } catch (e) {}
-  if (!jaContou) {
-    fbq('track', 'Lead', { content_name: 'grupo_whatsapp' }, { eventID: 'pb-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8) });
-    try { sessionStorage.setItem('pb_lead', '1'); } catch (e) {}
-  }
-
-  // Limite de segurança: a pessoa nunca fica presa aqui.
-  setTimeout(ir, 2000);
+  // O Lead só conta quando a pessoa toca em "Entrar no grupo" (um por sessão).
+  var saindo = false;
+  window.pbEntrar = function (ev, onde) {
+    if (ev && ev.preventDefault) ev.preventDefault();
+    if (saindo) return false;
+    saindo = true;
+    var jaContou = false;
+    try { jaContou = !!sessionStorage.getItem('pb_lead'); } catch (e) {}
+    if (!jaContou) {
+      fbq('track', 'Lead', { content_name: 'grupo_whatsapp', content_category: onde }, { eventID: 'pb-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8) });
+      try { sessionStorage.setItem('pb_lead', '1'); } catch (e) {}
+    }
+    // Dá tempo de o evento sair antes de abrir o WhatsApp.
+    setTimeout(function () { saindo = false; location.href = url; }, 350);
+    return false;
+  };
+  window.__pbDestino = url;
 })();
 </script>
 </head>
 <body>
 <main>
-  <div class="giro" aria-hidden="true"></div>
-  <h1>Preço Bão</h1>
-  <p role="status">Abrindo o grupo de ofertas no seu WhatsApp…</p>
-  <a class="botao" id="abrir" href="https://grp.lpboa.com/preco-bao/entrar">Entrar no grupo</a>
-  <small>Grupo gratuito. Você sai quando quiser. Este site não é afiliado à Meta nem ao WhatsApp.</small>
+  <img class="logo" src="/grupo/logo.jpg" alt="Preço Bão" width="112" height="112">
+  <h1>Grupo de ofertas <b>grátis</b> no WhatsApp</h1>
+  <p class="sub">Cupons e promoções de lojas oficiais, direto no seu celular.</p>
+
+  <a class="botao" id="entrar" href="https://grp.lpboa.com/preco-bao/entrar" onclick="return pbEntrar(event,'topo')">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path fill="#fff" d="M16 3C8.8 3 3 8.7 3 15.8c0 2.5.7 4.9 2 6.9L3 29l6.5-2c1.9 1 4.1 1.6 6.5 1.6 7.2 0 13-5.7 13-12.8S23.2 3 16 3zm0 23.3c-2.1 0-4.1-.6-5.8-1.7l-.4-.3-3.9 1.2 1.2-3.7-.3-.4c-1.2-1.8-1.8-3.8-1.8-5.9C5 9.9 9.9 5.2 16 5.2s11 4.7 11 10.6-4.9 10.5-11 10.5zm6-7.9c-.3-.2-1.9-1-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.6-1.6-1-.9-1.6-1.9-1.8-2.2-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.3.3-.6.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8s1.2 3.2 1.4 3.4c.2.2 2.4 3.6 5.8 5 .8.3 1.5.6 2 .7.8.3 1.6.2 2.2.1.7-.1 1.9-.8 2.2-1.5.3-.7.3-1.4.2-1.5-.1-.2-.3-.3-.6-.4z"/></svg>
+    Entrar no grupo grátis
+  </a>
+  <p class="nota">1 toque • você sai quando quiser</p>
+
+  <h2>JÁ SAIU NO GRUPO</h2>
+  <div class="grade">
+    <div class="card"><img src="/grupo/fila.jpg" alt="" loading="lazy"><i>-53%</i><div><span>Tênis Fila Spry</span><s>R$ 399</s> <strong>R$ 186</strong></div></div>
+    <div class="card"><img src="/grupo/s25.jpg" alt="" loading="lazy"><i>-45%</i><div><span>Galaxy S25 256GB</span><s>R$ 5.999</s> <strong>R$ 3.319</strong></div></div>
+    <div class="card"><img src="/grupo/puma.jpg" alt="" loading="lazy"><i>-39%</i><div><span>Tênis Puma Flyer Runner</span><s>R$ 249</s> <strong>R$ 151</strong></div></div>
+    <div class="card"><img src="/grupo/tcl.jpg" alt="" loading="lazy"><i>-38%</i><div><span>Smart TV TCL 50" QLED</span><s>R$ 2.999</s> <strong>R$ 1.859</strong></div></div>
+  </div>
+
+  <ul>
+    <li>100% grátis, sem cadastro</li>
+    <li>Mercado Livre, Shopee e Amazon</li>
+    <li>Só ofertas, sem conversa paralela</li>
+  </ul>
+
+  <a class="botao" href="https://grp.lpboa.com/preco-bao/entrar" onclick="return pbEntrar(event,'fim')">Entrar no grupo grátis</a>
+
+  <small>Preços vistos no dia da publicação no grupo e podem mudar. Este site usa o Pixel da Meta e não é afiliado à Meta, ao WhatsApp nem às lojas citadas.</small>
 </main>
 <script>
-  if (window.__pbDestino) document.getElementById('abrir').href = window.__pbDestino;
+  // Mantém os parâmetros do anúncio (UTMs) no link do botão.
+  if (window.__pbDestino) {
+    var links = document.querySelectorAll('a.botao');
+    for (var i = 0; i < links.length; i++) links[i].href = window.__pbDestino;
+  }
 </script>
 </body>
 </html>
